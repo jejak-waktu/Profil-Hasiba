@@ -415,11 +415,12 @@ header.scrolled .menu-btn {
 }
 
 .hero-left .ust{
-    font-size: 20px;
+    font-size: clamp (14px, 3vw, 30px);
     font-style: italic;
-    max-widht: 600px;
+    max-widht: 630px;
     margin-bottom: 30px;
     color: #f5f7fa;
+    white-space: nowrap;
 }
 
 
