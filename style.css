@@ -31,6 +31,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
 }
 
 html {
@@ -1268,12 +1269,12 @@ footer {
 }
 
 .footer-brand img {
-    width: 65px;
+    width: 75px;
     height: 65px;
-
     margin-bottom: 16px;
-
-    object-fit: contain;
+    object-fit: fill;
+    border-radius: 15px;
+    
 }
 
 .footer-brand h3,
@@ -1898,6 +1899,7 @@ footer {
 
     .footer-brand {
         grid-column: auto;
+        
     }
 
     .footer-brand p {
