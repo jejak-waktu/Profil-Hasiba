@@ -4,10 +4,6 @@
 ===================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // =========================
-    // Select Elements
-    // =========================
-
     const loader = document.querySelector(".loader");
     const header = document.querySelector("header");
     const menuBtn = document.querySelector(".menu-btn");
@@ -17,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const counters = document.querySelectorAll(".counter");
 
     const revealElements = document.querySelectorAll(
-        "section, .program-card, .value-card, .why-card, .quality-card"
+        ".program-card, .info-card, .why-card, .quality-card, .vision-card, .mission-card"
     );
 
 
@@ -39,24 +35,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =========================
-    // Navbar On Scroll
+    // Navbar
     // =========================
 
-    const handleNavbar = () => {
+    const updateNavbar = () => {
         if (!header) {
             return;
         }
 
-        if (window.scrollY > 60) {
+        if (window.scrollY > 40) {
             header.classList.add("scrolled");
         } else {
             header.classList.remove("scrolled");
         }
     };
 
-    window.addEventListener("scroll", handleNavbar);
+    window.addEventListener("scroll", updateNavbar, {
+        passive: true
+    });
 
-    handleNavbar();
+    updateNavbar();
 
 
     // =========================
@@ -64,49 +62,67 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================
 
     if (menuBtn && nav) {
-        menuBtn.addEventListener("click", () => {
-            nav.classList.toggle("show");
-
-            const isOpen = nav.classList.contains("show");
+        const closeMenu = () => {
+            nav.classList.remove("show");
 
             menuBtn.setAttribute(
                 "aria-expanded",
-                isOpen ? "true" : "false"
+                "false"
             );
+
+            menuBtn.setAttribute(
+                "aria-label",
+                "Buka menu"
+            );
+        };
+
+
+        const openMenu = () => {
+            nav.classList.add("show");
+
+            menuBtn.setAttribute(
+                "aria-expanded",
+                "true"
+            );
+
+            menuBtn.setAttribute(
+                "aria-label",
+                "Tutup menu"
+            );
+        };
+
+
+        menuBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            if (nav.classList.contains("show")) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
         });
 
 
-        // Tutup menu setelah link diklik
         nav.querySelectorAll("a").forEach((link) => {
             link.addEventListener("click", () => {
-                nav.classList.remove("show");
-
-                menuBtn.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
+                closeMenu();
             });
         });
 
 
-        // Tutup menu jika klik di luar navbar
         document.addEventListener("click", (event) => {
-            const clickedInsideMenu =
-                nav.contains(event.target);
-
-            const clickedMenuButton =
-                menuBtn.contains(event.target);
-
             if (
-                !clickedInsideMenu &&
-                !clickedMenuButton
+                !nav.contains(event.target) &&
+                !menuBtn.contains(event.target)
             ) {
-                nav.classList.remove("show");
+                closeMenu();
+            }
+        });
 
-                menuBtn.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
+
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 700) {
+                closeMenu();
             }
         });
     }
@@ -117,15 +133,42 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================
 
     faqItems.forEach((item) => {
-        const button =
-            item.querySelector(".faq-question");
+        const button = item.querySelector(
+            ".faq-question"
+        );
 
         if (!button) {
             return;
         }
 
         button.addEventListener("click", () => {
-            item.classList.toggle("active");
+            const isActive =
+                item.classList.contains("active");
+
+            faqItems.forEach((otherItem) => {
+                otherItem.classList.remove("active");
+
+                const otherButton =
+                    otherItem.querySelector(
+                        ".faq-question"
+                    );
+
+                if (otherButton) {
+                    otherButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+                }
+            });
+
+            if (!isActive) {
+                item.classList.add("active");
+
+                button.setAttribute(
+                    "aria-expanded",
+                    "true"
+                );
+            }
         });
     });
 
@@ -137,29 +180,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let counted = false;
 
     const animateCounter = (counter) => {
-        const target =
-            Number(counter.dataset.target);
+        const target = Number(
+            counter.dataset.target
+        );
 
-        const duration = 1500;
-
-        const startTime =
-            performance.now();
+        const duration = 1400;
+        const startTime = performance.now();
 
 
         const updateCounter = (currentTime) => {
             const elapsed =
                 currentTime - startTime;
 
-            const progress =
-                Math.min(
-                    elapsed / duration,
-                    1
-                );
+            const progress = Math.min(
+                elapsed / duration,
+                1
+            );
 
-            const value =
-                Math.floor(
-                    progress * target
-                );
+            const value = Math.floor(
+                progress * target
+            );
 
             counter.textContent = value;
 
@@ -169,8 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     updateCounter
                 );
             } else {
-                counter.textContent =
-                    target;
+                counter.textContent = target;
             }
         };
 
@@ -191,29 +230,27 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-
-        const triggerPoint =
-            statistics.getBoundingClientRect().top;
-
+        const top =
+            statistics.getBoundingClientRect()
+                .top;
 
         if (
-            triggerPoint <
-            window.innerHeight - 150
+            top <
+            window.innerHeight - 100
         ) {
             counted = true;
 
-            counters.forEach(
-                (counter) => {
-                    animateCounter(counter);
-                }
-            );
+            counters.forEach((counter) => {
+                animateCounter(counter);
+            });
         }
     };
 
 
     window.addEventListener(
         "scroll",
-        handleCounter
+        handleCounter,
+        { passive: true }
     );
 
     handleCounter();
@@ -224,36 +261,34 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================
 
     const revealOnScroll = () => {
-        revealElements.forEach(
-            (element) => {
-                const top =
-                    element.getBoundingClientRect()
-                        .top;
+        revealElements.forEach((element) => {
+            const top =
+                element.getBoundingClientRect()
+                    .top;
 
-
-                if (
-                    top <
-                    window.innerHeight - 120
-                ) {
-                    element.classList.add(
-                        "active"
-                    );
-                }
+            if (
+                top <
+                window.innerHeight - 80
+            ) {
+                element.classList.add(
+                    "visible"
+                );
             }
-        );
+        });
     };
 
 
     window.addEventListener(
         "scroll",
-        revealOnScroll
+        revealOnScroll,
+        { passive: true }
     );
 
     revealOnScroll();
 
 
     // =========================
-    // Back To Top Button
+    // Back To Top
     // =========================
 
     const topBtn =
@@ -261,8 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     topBtn.innerHTML = "↑";
 
-    topBtn.className =
-        "top-btn";
+    topBtn.className = "top-btn";
 
     topBtn.type = "button";
 
@@ -271,42 +305,33 @@ document.addEventListener("DOMContentLoaded", () => {
         "Kembali ke atas"
     );
 
-
-    document.body.appendChild(
-        topBtn
-    );
+    document.body.appendChild(topBtn);
 
 
-    const handleTopButton = () => {
+    const updateTopButton = () => {
         if (window.scrollY > 500) {
-            topBtn.classList.add(
-                "show"
-            );
+            topBtn.classList.add("show");
         } else {
-            topBtn.classList.remove(
-                "show"
-            );
+            topBtn.classList.remove("show");
         }
     };
 
 
     window.addEventListener(
         "scroll",
-        handleTopButton
+        updateTopButton,
+        { passive: true }
     );
 
-    handleTopButton();
+    updateTopButton();
 
 
-    topBtn.addEventListener(
-        "click",
-        () => {
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-        }
-    );
+    topBtn.addEventListener("click", () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
 
 
     // =========================
@@ -314,20 +339,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================
 
     document
-        .querySelectorAll(
-            'a[href^="#"]'
-        )
+        .querySelectorAll('a[href^="#"]')
         .forEach((anchor) => {
-
             anchor.addEventListener(
                 "click",
                 (event) => {
-
                     const targetId =
                         anchor.getAttribute(
                             "href"
                         );
-
 
                     if (
                         !targetId ||
@@ -336,24 +356,32 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-
                     const target =
                         document.querySelector(
                             targetId
                         );
 
-
                     if (!target) {
                         return;
                     }
 
-
                     event.preventDefault();
 
+                    const headerHeight =
+                        header
+                            ? header.offsetHeight
+                            : 0;
 
-                    target.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
+                    const targetPosition =
+                        target.getBoundingClientRect()
+                            .top +
+                        window.scrollY -
+                        headerHeight -
+                        10;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: "smooth"
                     });
                 }
             );
@@ -370,15 +398,19 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-    if (heroTitle) {
+    if (
+        heroTitle &&
+        !window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches
+    ) {
         heroTitle.animate(
             [
                 {
                     opacity: 0,
                     transform:
-                        "translateY(50px)"
+                        "translateY(35px)"
                 },
-
                 {
                     opacity: 1,
                     transform:
@@ -386,7 +418,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             ],
             {
-                duration: 1200,
+                duration: 900,
+                easing: "ease-out",
                 fill: "forwards"
             }
         );
@@ -407,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (copyright) {
-        copyright.innerHTML =
+        copyright.textContent =
             `© ${year} Hasiba Academy. All Rights Reserved.`;
     }
 });
