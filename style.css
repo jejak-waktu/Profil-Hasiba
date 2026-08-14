@@ -414,6 +414,15 @@ header.scrolled .menu-btn {
     line-height: 1.4;
 }
 
+.hero-left .ust{
+    font-size: 20px;
+    font-style: italic;
+    max-widht: 600px;
+    margin-bottom: 30px;
+    color: #f5f7fa;
+}
+
+
 .hero-description {
     max-width: 620px;
     margin-bottom: 32px;
